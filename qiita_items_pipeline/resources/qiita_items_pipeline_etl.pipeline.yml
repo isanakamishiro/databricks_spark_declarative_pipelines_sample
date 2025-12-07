@@ -1,0 +1,25 @@
+# The main pipeline for qiita_items_pipeline
+
+resources:
+  pipelines:
+    qiita_items_pipeline_etl:
+      name: qiita_items_pipeline_etl
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      serverless: true
+      root_path: "../src/qiita_items_pipeline_etl"
+      configuration:
+        src_catalog: ${var.catalog}
+        src_schema: ${var.src_schema}
+        src_items: ${var.src_items}
+        src_items_backfill: ${var.src_items_backfill}
+
+      libraries:
+        - glob:
+            include: ../src/qiita_items_pipeline_etl/transformations/**
+
+      environment:
+        dependencies:
+          # We include every dependency defined by pyproject.toml by defining an editable environment
+          # that points to the folder where pyproject.toml is deployed.
+          - --editable ${workspace.file_path}

@@ -1,0 +1,29 @@
+# Qiita Itemsの取得・加工パイプライン
+
+resources:
+  jobs:
+    qiita_items_setup_job:
+      name: qiita_items_setup_job
+
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: schema
+          default: ${var.schema}
+
+      tasks:
+        - task_key: qiita_backfill_items_ingestion
+          notebook_task:
+            notebook_path: ../src/qiita_items_pipeline_etl/ingestions/qiita_items_source.ipynb
+            base_parameters:
+              output_schema: ${var.src_schema}
+              output_table: ${var.src_items_backfill}
+              page_from: "1"
+              page_to: "1"
+              per_page: "10"
+            source: WORKSPACE
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "2"

@@ -1,0 +1,42 @@
+# Qiita Itemsの取得・加工パイプライン
+
+resources:
+  jobs:
+    qiita_items_pipeline_job:
+      name: qiita_items_pipeline_job
+
+      trigger:
+        periodic:
+          interval: 1
+          unit: DAYS
+
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: schema
+          default: ${var.schema}
+
+      tasks:
+        - task_key: qiita_items_ingestion
+          notebook_task:
+            notebook_path: ../src/qiita_items_pipeline_etl/ingestions/qiita_items_source.ipynb
+            base_parameters:
+              output_schema: ${var.src_schema}
+              output_table: ${var.src_items}
+              page_from: ${var.qiita_page_from}
+              page_to: ${var.qiita_page_to}
+              per_page: ${var.qiita_per_page}
+              query: tag:databricks
+            source: WORKSPACE
+
+        - task_key: refresh_pipeline
+          depends_on:
+            - task_key: qiita_items_ingestion
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.qiita_items_pipeline_etl.id}
+            full_refresh: false
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "2"

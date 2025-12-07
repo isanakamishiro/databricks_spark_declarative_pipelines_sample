@@ -1,0 +1,60 @@
+# This is a Databricks asset bundle definition for qiita_items_pipeline.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: qiita_items_pipeline
+  uuid: bf4b18f4-ba4e-4273-b923-b801fc54f846
+
+include:
+  - resources/*.yml
+  - resources/*/*.yml
+
+# 変数の設定
+variables:
+  catalog:
+    description: パイプラインで利用するカタログ
+  schema:
+    description: パイプラインで利用するスキーマ名
+  src_schema:
+    description: Qiitaのソースデータを管理するスキーマ
+  src_items:
+    description: Qiitaのソース投稿データを管理するテーブル名
+  src_items_backfill:
+    description: QiitaのBackfill用投稿データを管理しているテーブル名
+  qiita_per_page:
+    description: Qiitaの投稿データ取得件数
+    default: 5
+  qiita_page_from:
+    description: Qiitaの投稿データ取得範囲(from)
+    default: 1
+  qiita_page_to:
+    description: Qiitaの投稿データ取得範囲(to)
+    default: 1
+
+targets:
+  dev:
+    mode: development
+    default: true
+    # workspace:
+    #   host: https://dbc-f1d46cb2-e7aa.cloud.databricks.com
+    variables:
+      catalog: workspace
+      schema: ${bundle.target}_${workspace.current_user.short_name}_qiita
+      src_schema: ${bundle.target}_${workspace.current_user.short_name}_qiita
+      src_items: items
+      src_items_backfill: backfill_items
+
+  prod:
+    mode: production
+    workspace:
+      # host: https://dbc-f1d46cb2-e7aa.cloud.databricks.com
+      root_path: /Workspace/Users/isanakamishiro@gmail.com/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      catalog: workspace
+      schema: qiita
+      src_schema: qiita_source
+      src_items: items
+      src_items_backfill: backfill_items
+
+    permissions:
+      - user_name: isanakamishiro@gmail.com
+        level: CAN_MANAGE
