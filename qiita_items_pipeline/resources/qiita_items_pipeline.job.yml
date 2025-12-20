@@ -26,7 +26,7 @@ resources:
               page_from: ${var.qiita_page_from}
               page_to: ${var.qiita_page_to}
               per_page: ${var.qiita_per_page}
-              query: tag:databricks
+              query: "tag:databricks"
             source: WORKSPACE
 
         - task_key: refresh_pipeline
@@ -36,7 +36,17 @@ resources:
             pipeline_id: ${resources.pipelines.qiita_items_pipeline_etl.id}
             full_refresh: false
 
+        # 以下が追加部分
+        - task_key: index_sync
+          depends_on:
+            - task_key: refresh_pipeline          
+          notebook_task:
+            notebook_path: ../src/qiita_items_pipeline_etl/vectorstore/index_sync.ipynb
+            base_parameters:
+              index_name: "qiita_ai_augmented_items_index"
+            source: WORKSPACE
+
       environments:
         - environment_key: default
           spec:
-            environment_version: "2"
+            environment_version: "4"

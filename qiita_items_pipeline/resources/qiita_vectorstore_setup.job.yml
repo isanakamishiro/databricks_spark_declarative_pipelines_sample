@@ -1,0 +1,26 @@
+# ベクトルストア作成用Job
+resources:
+  jobs:
+    qiita_vectorstore_setup_job:
+      name: qiita_vectorstore_setup_job
+
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: schema
+          default: ${var.schema}
+
+      tasks:
+        - task_key: vectorstore_setup
+          notebook_task:
+            notebook_path: ../src/qiita_items_pipeline_etl/vectorstore/vectorstore_creation.ipynb
+            base_parameters:
+              vs_endpoint: "default_vs_endpoint"
+              source_table: "qiita_ai_augmented_items"
+              index_name: "qiita_ai_augmented_items_index"
+            source: WORKSPACE
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"

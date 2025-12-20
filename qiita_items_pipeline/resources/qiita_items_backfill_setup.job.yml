@@ -1,9 +1,8 @@
-# Qiita Itemsの取得・加工パイプライン
-
+# Qiita Itemsのバックフィルデータ作成用
 resources:
   jobs:
-    qiita_items_setup_job:
-      name: qiita_items_setup_job
+    qiita_items_backfill_setup_job:
+      name: qiita_items_backfill_setup_job
 
       parameters:
         - name: catalog
@@ -19,11 +18,12 @@ resources:
               output_schema: ${var.src_schema}
               output_table: ${var.src_items_backfill}
               page_from: "1"
-              page_to: "1"
-              per_page: "10"
+              page_to: "10"
+              per_page: "100"
+              query: ""
             source: WORKSPACE
 
       environments:
         - environment_key: default
           spec:
-            environment_version: "2"
+            environment_version: "4"

@@ -12,23 +12,22 @@ dp.create_streaming_table(
     comment="新しいQiitaの投稿データを追記する",
 )
 
-
 # Qiitaの記事データをStreaming Tableに追記するフロー
 @dp.append_flow(
     target="qiita_cdc_items_raw",
-    name="qiita_cdc_items_raw_ingest_flow",
+    name="qiita_cdc_raw_items_ingest_flow",
 )
-def qiita_cdc_items_raw_ingest_flow():
+def ingest_raw_items_flow():
     return spark.readStream.table(f"`{qiita_catalog}`.`{qiita_schema}`.`{qiita_items}`")
 
 
 # Qiitaのバックフィル用記事データをStreaming Tableに追記するフロー。一度だけしか実行されない。
 @dp.append_flow(
     target="qiita_cdc_items_raw",
-    name="qiita_cdc_items_backfill_raw_ingest_flow",
+    name="qiita_cdc_raw_backfill_items_ingest_flow",
     once=True,
 )
-def qiita_cdc_items_backfill_raw_ingest_flow():
+def ingest_raw_backfill_items_flow():
     return spark.read.table(
         f"`{qiita_catalog}`.`{qiita_schema}`.`{qiita_items_backfill}`"
     )
@@ -36,7 +35,7 @@ def qiita_cdc_items_backfill_raw_ingest_flow():
 
 # QiitaのCDC記事データを成形したStreaming Tableを作成。Excepectation付。
 @dp.table(
-    name="qiita_cdc_items_clean",
+    name="qiita_cdc_cleaned_items",
     comment="品質管理とクリーンナップされたQiita投稿データ",
     table_properties={"delta.feature.variantType-preview": "supported"},
 )
@@ -45,7 +44,7 @@ def qiita_cdc_items_backfill_raw_ingest_flow():
         "valid_id": "id IS NOT NULL",
     }
 )
-def qiita_cdc_items_clean():
+def clean_cdc_items():
     df = spark.readStream.table("qiita_cdc_items_raw")
 
     df = df.withColumn(

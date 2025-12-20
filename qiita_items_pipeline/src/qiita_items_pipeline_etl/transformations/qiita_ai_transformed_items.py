@@ -1,9 +1,6 @@
 from pyspark import pipelines as dp
 import pyspark.sql.functions as F
 
-EMBEDDING_MODEL = "databricks-bge-large-en"
-
-
 # AI Functionsを使って要約や埋め込みを直接追加
 @dp.table(
     name="qiita_ai_augmented_items",
@@ -34,9 +31,5 @@ def add_ai_summary():
     # 要約英訳
     translate_expr = "ai_translate(summarized_body, 'en')"
     df = df.withColumn("en_summarized_body", F.expr(translate_expr))
-
-    # 埋め込みの直接追加(今回は行わない)
-    # embedding_expr = f"ai_query('{EMBEDDING_MODEL}', en_summarized_body)"
-    # df = df.withColumn("embedding", F.expr(embedding_expr))
 
     return df

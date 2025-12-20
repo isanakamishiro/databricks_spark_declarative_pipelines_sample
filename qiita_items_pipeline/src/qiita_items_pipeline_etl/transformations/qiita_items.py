@@ -11,7 +11,7 @@ dp.create_streaming_table(
 # Auto CDC flow機能を使って、CDCデータを変換して、Streaming Tableに流す
 dp.create_auto_cdc_flow(
     target="qiita_items",
-    source="qiita_cdc_items_clean",
+    source="qiita_cdc_cleaned_items",
     keys=["id"],
     sequence_by=F.col("updated_at"),
     ignore_null_updates=False,
