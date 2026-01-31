@@ -43,7 +43,7 @@ resources:
           notebook_task:
             notebook_path: ../src/qiita_items_pipeline_etl/vectorstore/index_sync.ipynb
             base_parameters:
-              index_name: "qiita_ai_augmented_items_index"
+              index_name: "qiita_items_index"
             source: WORKSPACE
 
       environments:

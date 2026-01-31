@@ -1,0 +1,22 @@
+# メトリクスビュー作成用Job
+resources:
+  jobs:
+    qiita_metric_views_setup_job:
+      name: qiita_metric_views_setup_job
+
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: schema
+          default: ${var.schema}
+
+      tasks:
+        - task_key: metric_view_setup
+          notebook_task:
+            notebook_path: ../src/qiita_items_pipeline_etl/metric_views/metric_view_creation.ipynb
+            source: WORKSPACE
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"
